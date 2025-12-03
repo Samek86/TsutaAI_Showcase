@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ツタAI - あなたの仕事をサポートするAIアシスタント</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --text-color: #111827;
+            --text-secondary: #6b7280;
+            --bg-color: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #f8fafc;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        /* ヘッダー */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* コンテナ */
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* サイドバー */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--sidebar-text);
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar nav a {
+            color: var(--sidebar-text);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .sidebar nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar nav a.active {
+            background: #667eea;
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            max-width: 900px;
+        }
+
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        section h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        section p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        /* カード */
+        .card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        /* 特徴カード */
+        .feature-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h4 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: white;
+            opacity: 0.95;
+        }
+
+        /* リスト */
+        .feature-list {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .feature-list li {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-secondary);
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .feature-list li strong {
+            color: #667eea;
+        }
+
+        /* ステップカード */
+        .step-card {
+            display: flex;
+            align-items: start;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            margin-bottom: 0.5rem;
+            color: #667eea;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+        }
+
+        /* メリットグリッド */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .benefit-item {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .benefit-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-item h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .cta-section h3 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            color: white;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* 画像プレースホルダー */
+        .screenshot {
+            background: linear-gradient(135deg, #e0e7ff, #dbeafe);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+            margin: 2rem 0;
+        }
+
+        /* モバイルメニュー */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 999;
+                transition: left 0.3s;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            section h2 {
+                font-size: 1.5rem;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* スムーズスクロール */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* オーバーレイ */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* バッジ */
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .badge.new {
+            background: var(--success-color);
+        }
+
+        .badge.popular {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- モバイルメニューボタン -->
+    <button class="mobile-menu-btn" onclick="toggleMenu()">☰ メニュー</button>
+
+    <!-- オーバーレイ -->
+    <div class="overlay" onclick="toggleMenu()"></div>
+
+    <!-- ヘッダー -->
+    <div class="header">
+        <h1>ツタAI</h1>
+        <p>あなたの仕事をサポートするAIアシスタント</p>
+    </div>
+
+    <!-- コンテナ -->
+    <div class="container">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <h2>目次</h2>
+            <nav>
+                <ul>
+                    <li><a href="#introduction" onclick="scrollToSection('introduction')">ツタAIとは？</a></li>
+                    <li><a href="#benefits" onclick="scrollToSection('benefits')">あなたにとってのメリット</a></li>
+                    <li><a href="#desktop-app" onclick="scrollToSection('desktop-app')">デスクトップアプリ</a></li>
+                    <li><a href="#web-admin" onclick="scrollToSection('web-admin')">Web管理画面</a></li>
+                    <li><a href="#ai-features" onclick="scrollToSection('ai-features')">AIがサポートする機能</a></li>
+                    <li><a href="#help-request" onclick="scrollToSection('help-request')">困った時のヘルプ機能</a></li>
+                    <li><a href="#daily-workflow" onclick="scrollToSection('daily-workflow')">1日の流れ</a></li>
+                    <li><a href="#tips" onclick="scrollToSection('tips')">便利な使い方</a></li>
+                    <li><a href="#faq" onclick="scrollToSection('faq')">よくある質問</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- イントロダクション -->
+            <section id="introduction">
+                <h2>ツタAIとは？</h2>
+                <p>
+                    ツタAIは、<strong>あなたの日々の仕事を楽にするAI搭載のプロジェクト管理ツール</strong>です。
+                </p>
+
+                <div class="feature-card">
+                    <h4>✨ 面倒な作業はAIにお任せ！</h4>
+                    <p>
+                        タスクの整理、進捗報告、日報作成など、時間のかかる作業をAIが自動でサポート。
+                        あなたは本来の仕事に集中できます。
+                    </p>
+                </div>
+
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">⏱️</div>
+                        <h4>時間を節約</h4>
+                        <p>日報作成や進捗入力が自動化され、毎日30分以上の時間を節約</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🤝</div>
+                        <h4>困った時すぐ助けが来る</h4>
+                        <p>ヘルプボタン1つで、最適な助っ人を自動で見つけてくれる</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">📊</div>
+                        <h4>自動で記録</h4>
+                        <p>作業時間が自動で記録され、手動入力の手間がゼロ</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- メリット -->
+            <section id="benefits">
+                <h2>あなたにとってのメリット</h2>
+
+                <div class="card">
+                    <h4>1. 面倒な入力作業が不要に <span class="badge popular">人気</span></h4>
+                    <ul class="feature-list">
+                        <li><strong>作業時間の自動記録</strong> - デスクトップアプリが作業を自動トラッキング</li>
+                        <li><strong>日報の自動生成</strong> - AIが今日の作業を要約して日報を作成</li>
+                        <li><strong>進捗の自動更新</strong> - タスク完了ボタンを押すだけ</li>
+                        <li>毎日の報告作業が<strong>30分→5分</strong>に短縮！</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>2. 困った時にすぐ助けを呼べる <span class="badge new">NEW</span></h4>
+                    <ul class="feature-list">
+                        <li><strong>ヘルプリクエスト機能</strong> - ボタン1つで助けを依頼</li>
+                        <li><strong>AIがベストな助っ人を推奨</strong> - スキルと空き状況から最適な人を自動マッチング</li>
+                        <li><strong>問題の自動要約</strong> - あなたの状況をAIが整理して伝えてくれる</li>
+                        <li>ブロックされた時の不安が解消！</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>3. 適切なタスクが割り当てられる</h4>
+                    <ul class="feature-list">
+                        <li><strong>スキルマッチング</strong> - あなたの得意分野のタスクが優先的に割り当てられる</li>
+                        <li><strong>作業負荷の均等化</strong> - 一人だけ忙しくなることがない</li>
+                        <li><strong>成長機会の提供</strong> - 新しいスキルを学べるタスクも適度に割り当て</li>
+                        <li>無理のない仕事量で、モチベーション維持！</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>4. 自分の成長が見える</h4>
+                    <ul class="feature-list">
+                        <li><strong>スキル成長の可視化</strong> - 完了したタスクから自動でスキル評価</li>
+                        <li><strong>パフォーマンス分析</strong> - 自分の強み・弱みが分かる</li>
+                        <li><strong>チーム内での貢献度</strong> - 頑張りが数値で見える</li>
+                        <li>キャリアアップの材料に！</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>5. ストレスが軽減される</h4>
+                    <ul class="feature-list">
+                        <li><strong>メンタルヘルス分析</strong> - 心の健康状態をAIが見守る</li>
+                        <li><strong>適切なアドバイス</strong> - ストレスが高い時にサポート提案</li>
+                        <li><strong>作業リズムの最適化</strong> - 無理のないスケジュールに調整</li>
+                        <li>健康的に働ける環境へ！</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- デスクトップアプリ -->
+            <section id="desktop-app">
+                <h2>デスクトップアプリ <span class="badge popular">よく使う</span></h2>
+                <p>
+                    <strong>デスクトップに常駐する、あなた専用のアシスタント</strong>です。
+                </p>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="image/3_2.png" alt="デスクトップアプリのスクリーンショット" style="max-width: 100%; border: 2px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                    <br><small style="color: var(--text-secondary);">（右下に常駐し、今日のタスクと進捗を表示）</small>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>朝、ログインする</h4>
+                        <p>ユーザー名とパスワードでログイン。今日のタスク一覧が自動で表示されます。</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>やるタスクを選んで「開始」</h4>
+                        <p>チェックボックスでタスクを選択し、「作業開始」ボタンをクリック。</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>作業が自動で記録される</h4>
+                        <p>
+                            マウス・キーボード操作、作業時間が自動で記録されます。
+                            さらに、指定フォルダ内のファイル修正やGit/SVNへのプッシュも自動感知。
+                            手動で時間を入力する必要はありません！
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>タスク完了ボタンを押す</h4>
+                        <p>タスクが終わったら「完了」ボタンを押すだけ。進捗が自動で更新されます。</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>日報がAIで自動生成される</h4>
+                        <p>
+                            夕方、今日の作業ログからAIが自動で日報を作成。
+                            内容を確認して送信するだけ！
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>デスクトップアプリの便利機能</h4>
+                    <ul class="feature-list">
+                        <li><strong>常駐ウィジェット</strong> - 画面右下に常駐し、進捗を常に表示</li>
+                        <li><strong>一時停止機能</strong> - 休憩時は一時停止ボタンで記録を止める</li>
+                        <li><strong>カンバンボード</strong> - 個人タスクをドラッグ&ドロップで整理</li>
+                        <li><strong>自動作業検知</strong> - Git/SVNプッシュや指定フォルダ内のファイル修正を自動感知</li>
+                        <li><strong>ヘルプボタン</strong> - 困った時はすぐに助けを依頼<span class="badge new">NEW</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Web管理画面 -->
+            <section id="web-admin">
+                <h2>Web管理画面</h2>
+                <p>
+                    ブラウザからアクセスできる管理画面。プロジェクト全体を俯瞰したり、
+                    タスクの詳細を確認したりできます。
+                </p>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <img src="image/web-admin.png" alt="Web管理画面のスクリーンショット" style="max-width: 100%; border: 2px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                    <br><small style="color: var(--text-secondary);">（タスクボード、ガントチャート、カレンダービュー）</small>
+                </div>
+
+                <div class="card">
+                    <h4>主な機能</h4>
+                    <ul class="feature-list">
+                        <li><strong>プロジェクトダッシュボード</strong> - 全体の進捗を一目で確認</li>
+                        <li><strong>タスクボード</strong> - カンバン形式でタスク管理（未着手/進行中/完了）</li>
+                        <li><strong>ガントチャート</strong> - タイムライン表示で期限を把握</li>
+                        <li><strong>カレンダービュー</strong> - カレンダー形式で予定を確認</li>
+                        <li><strong>メンバー一覧</strong> - チームメンバーの稼働状況を確認</li>
+                        <li><strong>休暇登録</strong> - 休暇申請と承認</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>タスクの見方</h4>
+                    <ul class="feature-list">
+                        <li><strong>タスクカード</strong> - タスク名、期限、担当者、優先度が一目で分かる</li>
+                        <li><strong>進捗バー</strong> - タスクの完了率が視覚的に表示</li>
+                        <li><strong>コメント機能</strong> - タスクにコメントを追加して情報共有</li>
+                        <li><strong>添付ファイル</strong> - 関連資料をタスクに添付</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- AI機能 -->
+            <section id="ai-features">
+                <h2>AIがサポートする機能</h2>
+                <p>
+                    ツタAIには<strong>28種類のAI機能</strong>が搭載されています。
+                    あなたの仕事を賢くサポートします。
+                </p>
+
+                <div class="card">
+                    <h4>日報の自動生成 <span class="badge popular">便利</span></h4>
+                    <p>
+                        今日の作業ログから、AIが自動で日報を作成します。
+                    </p>
+                    <ul class="feature-list">
+                        <li>作業内容の要約</li>
+                        <li>完了したタスクのリスト</li>
+                        <li>遭遇した課題</li>
+                        <li>明日の予定</li>
+                    </ul>
+                    <p><strong>所要時間: 15分 → 3分</strong></p>
+                </div>
+
+                <div class="card">
+                    <h4>タスク説明の自動生成</h4>
+                    <p>
+                        タスク名だけ入力すれば、AIが詳細な説明文（800文字）を自動生成。
+                        何をすべきか迷いません。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>最適なタスクの提案</h4>
+                    <p>
+                        あなたのスキル、経験、現在の作業負荷を考慮して、
+                        今やるべきタスクをAIが提案します。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>リスクの早期発見</h4>
+                    <p>
+                        3日間進捗がないタスクを自動検出し、アラートを送信。
+                        問題が大きくなる前に対処できます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>メンタルヘルスのサポート</h4>
+                    <p>
+                        作業ログや日報の内容から、ストレス状態をAIが分析。
+                        必要に応じてアドバイスや休暇を提案します。
+                    </p>
+                </div>
+            </section>
+
+            <!-- ヘルプリクエスト -->
+            <section id="help-request">
+                <h2>困った時のヘルプ機能 <span class="badge new">NEW</span></h2>
+                <p>
+                    <strong>作業で詰まった時、ボタン1つで助けを呼べる機能</strong>です。
+                </p>
+
+                <div class="feature-card">
+                    <h4>🆘 こんな時に使おう</h4>
+                    <p>
+                        ・エラーが解決できない<br>
+                        ・技術的な質問がある<br>
+                        ・タスクの進め方が分からない<br>
+                        ・3日間進捗がない<br>
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>ヘルプボタンを押す</h4>
+                        <p>デスクトップアプリまたはWeb画面の「ヘルプを依頼する」ボタンをクリック。</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>困っている内容を入力</h4>
+                        <p>
+                            タスクを選択し、何に困っているか簡単に入力。
+                            AIが自動で状況を整理してくれます。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>AIが最適なヘルパーを推奨</h4>
+                        <p>
+                            チームメンバーの中から、スキル、経験、空き状況を考慮して、
+                            最も適した助っ人を自動で見つけます。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>ヘルパーに通知が届く</h4>
+                        <p>
+                            推奨されたメンバーに通知が届き、あなたを助けに来てくれます。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>ヘルプ機能のメリット</h4>
+                    <ul class="feature-list">
+                        <li><strong>遠慮なく助けを求められる</strong> - システムが自動で最適な人を選んでくれるので気が楽</li>
+                        <li><strong>問題が早く解決</strong> - 適切な人にすぐ相談できるので、数日悩むことがなくなる</li>
+                        <li><strong>チーム内の知識共有</strong> - 誰が何に詳しいかが自然と分かる</li>
+                        <li><strong>ブロックされた時間が減る</strong> - 平均2日 → 0.5日に短縮！</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 1日の流れ -->
+            <section id="daily-workflow">
+                <h2>ツタAIを使った1日の流れ</h2>
+
+                <div class="card">
+                    <h4>9:00 - 出社・ログイン</h4>
+                    <p>デスクトップアプリにログイン。今日のタスク一覧が自動で表示されます。</p>
+                    <ul class="feature-list">
+                        <li>AIが優先度順に並べてくれているので、上から順にやればOK</li>
+                        <li>気分や体調に応じて、やるタスクを選んでチェック</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>9:15 - 作業開始</h4>
+                    <p>「作業開始」ボタンをクリック。常駐ウィジェットが表示されます。</p>
+                    <ul class="feature-list">
+                        <li>作業時間、マウス・キーボード操作が自動で記録される</li>
+                        <li>Git/SVNへのプッシュや指定フォルダ内のファイル修正も自動感知</li>
+                        <li>進捗バーで「あとどれくらい？」が分かる</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>11:00 - エラーで詰まった</h4>
+                    <p>認証エラーが解決できず、30分経過。ヘルプボタンを押します。</p>
+                    <ul class="feature-list">
+                        <li>「認証トークンの取得に失敗」と入力</li>
+                        <li>AIが状況を整理し、バックエンドに詳しい田中さんを推奨</li>
+                        <li>田中さんに通知が届き、10分後にサポートしてくれた！</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>12:00 - ランチ休憩</h4>
+                    <p>常駐ウィジェットの「一時停止」ボタンを押して休憩。</p>
+                </div>
+
+                <div class="card">
+                    <h4>13:00 - 午後の作業</h4>
+                    <p>「再開」ボタンを押して作業継続。次のタスクに移ります。</p>
+                </div>
+
+                <div class="card">
+                    <h4>17:00 - タスク完了</h4>
+                    <p>今日予定していたタスクがすべて完了。「完了」ボタンを押します。</p>
+                    <ul class="feature-list">
+                        <li>進捗が自動で100%に更新される</li>
+                        <li>次のタスクが自動で表示される</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>17:30 - 日報作成</h4>
+                    <p>AIが今日の作業ログから日報を自動生成。内容を確認して送信。</p>
+                    <ul class="feature-list">
+                        <li>所要時間: たった3分！</li>
+                        <li>手動で書くと15分かかっていたのが大幅短縮</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>18:00 - 退社</h4>
+                    <p>お疲れ様でした！明日のタスクは自動で準備されています。</p>
+                </div>
+            </section>
+
+            <!-- 便利な使い方 -->
+            <section id="tips">
+                <h2>便利な使い方（Tips）</h2>
+
+                <div class="card">
+                    <h4>💡 Tip 1: タスクの並び替え</h4>
+                    <p>
+                        ダッシュボードでタスクをドラッグ&ドロップすると、優先順位を変更できます。
+                        自分のやりやすい順番に並べましょう。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>💡 Tip 2: 個人タスクの追加</h4>
+                    <p>
+                        プロジェクトタスク以外に、自分だけのタスク（勉強、資料作成など）も登録できます。
+                        カンバンボードで管理しましょう。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>💡 Tip 3: 休暇の事前登録</h4>
+                    <p>
+                        休暇予定を事前に登録すると、AIがスケジュールを自動調整してくれます。
+                        影響分析レポートも見られます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>💡 Tip 4: コメントで質問</h4>
+                    <p>
+                        タスクの詳細画面でコメントを追加すると、担当者や関係者に通知が届きます。
+                        簡単な質問ならヘルプリクエストより手軽です。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>💡 Tip 5: 進捗の手動調整</h4>
+                    <p>
+                        タスクの進捗率は自動で記録されますが、手動でも調整可能。
+                        「50%完了」など、細かく設定できます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>💡 Tip 6: 通知設定のカスタマイズ</h4>
+                    <p>
+                        設定画面で通知の種類（タスク割り当て、コメント、アラートなど）を
+                        個別にON/OFFできます。自分に合った設定にしましょう。
+                    </p>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section id="faq">
+                <h2>よくある質問（FAQ）</h2>
+
+                <div class="card">
+                    <h4>Q1: デスクトップアプリは常に起動しておく必要がありますか？</h4>
+                    <p>
+                        <strong>A:</strong> はい、作業時間の自動トラッキングのため、作業中は起動しておいてください。
+                        ただし、休憩時は一時停止ボタンで記録を止められます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>Q2: プライバシーは大丈夫？キーボード入力が全部記録されるの？</h4>
+                    <p>
+                        <strong>A:</strong> ご安心ください。記録されるのは「キー入力の回数」のみで、
+                        何を入力したかの内容は記録されません。マウスクリック回数、アクティブウィンドウ名、
+                        作業時間のみが記録されます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>Q3: ヘルプリクエストを送ると、相手に迷惑じゃないですか？</h4>
+                    <p>
+                        <strong>A:</strong> AIが相手の空き状況を考慮して推奨するので、忙しい人には届きません。
+                        また、ヘルプ対応もパフォーマンス評価に含まれるので、むしろチーム貢献として評価されます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>Q4: スマホからも使えますか？</h4>
+                    <p>
+                        <strong>A:</strong> Web管理画面はスマホ・タブレットでもアクセス可能です。
+                        デスクトップアプリはWindows専用ですが、Web画面でタスク確認や進捗更新ができます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>Q5: AIが間違った日報を生成したらどうすればいい？</h4>
+                    <p>
+                        <strong>A:</strong> 生成された日報は編集可能です。内容を確認して、
+                        必要に応じて修正してから送信してください。修正内容はAIの学習に使われ、
+                        次回からより正確になります。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>Q6: タスクの期限に間に合わなさそうな時は？</h4>
+                    <p>
+                        <strong>A:</strong> AIが期限の2日前に自動でアラートを送信します。
+                        また、進捗状況から自動で納期予測を行い、遅延リスクがあれば
+                        早めに通知が来るので安心です。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>Q7: 個人タスクとプロジェクトタスクの違いは？</h4>
+                    <p>
+                        <strong>A:</strong> プロジェクトタスクはチーム全体で共有されるタスク。
+                        個人タスクはあなただけが見られるタスクです（勉強、資料整理など）。
+                        どちらも作業時間は記録されます。
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h4>Q8: 上司に監視されている感じがして不安です</h4>
+                    <p>
+                        <strong>A:</strong> ツタAIの目的は監視ではなく、業務効率化とサポートです。
+                        記録データは主にAIの分析と自動化に使われ、適切なタスク割り当てや
+                        メンタルヘルスケアに活用されます。透明性のある運用を心がけています。
+                    </p>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <div class="cta-section">
+                <h3>さあ、ツタAIで快適な仕事を始めよう！</h3>
+                <p>
+                    面倒な作業はAIにお任せ。あなたは本来の仕事に集中できます。<br>
+                    困った時はすぐにヘルプを呼べる、安心の環境です。
+                </p>
+                <a href="mailto:2025gw04@gmail.com?subject=導入リクエスト" class="cta-button">導入をリクエストする</a>
+            </div>
+
+            <div class="card">
+                <h4>サポート窓口</h4>
+                <p>ご不明な点がありましたら、お気軽にお問い合わせください。</p>
+                <p><strong>メール:</strong> 2025gw04@gmail.com</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                // モバイルメニューを閉じる
+                if (window.innerWidth <= 768) {
+                    toggleMenu();
+                }
+            }
+        }
+
+        // アクティブリンクのハイライト
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.sidebar nav a');
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 60) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
