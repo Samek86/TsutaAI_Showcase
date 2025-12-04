@@ -95,6 +95,29 @@
             justify-content: center;
         }
 
+        /* ギャラリーボタンのフォーカス・アクティブ状態を無効化 */
+        .gallery-modal button:focus,
+        .gallery-modal button:active,
+        .gallery-modal button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background-color: inherit !important;
+        }
+
+        /* 左右ボタンのクリック時の背景色を固定 */
+        .gallery-modal .gallery-nav-btn:active {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* 閉じるボタンのクリック時の背景色を固定 */
+        .gallery-modal .gallery-close-btn:active {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .gallery-modal .gallery-close-btn {
+            padding-bottom: 3px;
+        }
+
         /* アニメーション */
         .fade-in-up {
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -768,9 +791,9 @@
 
     <!-- ギャラリーモーダル -->
     <div class="gallery-modal backdrop-blur-md" id="galleryModal">
-        <button class="absolute top-6 right-6 w-12 h-12 bg-black/40 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center text-3xl focus:outline-none transition-all border-2 border-white/40 hover:border-white/80 shadow-lg opacity-70 hover:opacity-100" onclick="closeGallery()">&times;</button>
+        <button class="gallery-close-btn absolute top-6 right-6 w-12 h-12 bg-black/40 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center text-3xl focus:outline-none focus:ring-0 transition-all border-2 border-white/40 hover:border-white/80 shadow-lg opacity-70 hover:opacity-100" onclick="closeGallery()">&times;</button>
 
-        <button class="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/30 hover:bg-black/60 backdrop-blur-sm text-white rounded-full flex items-center justify-center focus:outline-none transition-all border-2 border-white/50 hover:border-white/90 shadow-lg opacity-60 hover:opacity-100 hover:scale-110" onclick="navigateGallery(-1)">
+        <button class="gallery-nav-btn absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/30 hover:bg-black/60 backdrop-blur-sm text-white rounded-full flex items-center justify-center focus:outline-none focus:ring-0 transition-all border-2 border-white/50 hover:border-white/90 shadow-lg opacity-60 hover:opacity-100 hover:scale-110" onclick="navigateGallery(-1)">
             <i class="fas fa-chevron-left text-2xl"></i>
         </button>
 
@@ -778,7 +801,7 @@
             <img src="" alt="ギャラリー画像" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" id="galleryImage">
         </div>
 
-        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/30 hover:bg-black/60 backdrop-blur-sm text-white rounded-full flex items-center justify-center focus:outline-none transition-all border-2 border-white/50 hover:border-white/90 shadow-lg opacity-60 hover:opacity-100 hover:scale-110" onclick="navigateGallery(1)">
+        <button class="gallery-nav-btn absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/30 hover:bg-black/60 backdrop-blur-sm text-white rounded-full flex items-center justify-center focus:outline-none focus:ring-0 transition-all border-2 border-white/50 hover:border-white/90 shadow-lg opacity-60 hover:opacity-100 hover:scale-110" onclick="navigateGallery(1)">
             <i class="fas fa-chevron-right text-2xl"></i>
         </button>
     </div>
