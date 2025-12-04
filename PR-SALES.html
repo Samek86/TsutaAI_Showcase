@@ -1,1139 +1,769 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プロジェクト失敗の連鎖を断ち切る - ツタAI</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans JP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#75EA66',
+                        'primary-dark': '#4BA262',
+                        'bg-gray': '#F9FAFB',
+                        'card-border': '#E5E7EB',
+                        text: {
+                            main: '#111827',
+                            sub: '#4B5563'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #dc2626;
-            --primary-dark: #991b1b;
-            --secondary-color: #10b981;
-            --accent-color: #f59e0b;
-            --text-color: #111827;
-            --text-secondary: #6b7280;
-            --bg-color: #ffffff;
-            --bg-secondary: #f9fafb;
-            --border-color: #e5e7eb;
-            --sidebar-bg: #1e293b;
-            --sidebar-text: #f8fafc;
-            --danger-color: #dc2626;
-            --warning-color: #f59e0b;
-            --success-color: #10b981;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background: var(--bg-color);
+            font-feature-settings: "palt";
+            letter-spacing: 0.02em;
         }
 
-        /* ヘッダー */
-        .header {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        .header h1 {
-            font-size: 2.8rem;
-            margin-bottom: 1rem;
-            font-weight: 900;
-        }
-
-        .header .subtitle {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.95;
-        }
-
-        /* 緊急CTA */
-        .urgent-cta {
-            background: #f59e0b;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
+        @keyframes pulse-urgent {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
         }
 
-        /* コンテナ */
-        .container {
-            display: flex;
-            max-width: 1400px;
-            margin: 0 auto;
+        .pulse-urgent {
+            animation: pulse-urgent 2s infinite;
         }
 
-        /* サイドバー */
-        .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            padding: 2rem 1.5rem;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .sidebar h2 {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            color: var(--sidebar-text);
-        }
-
-        .sidebar nav ul {
-            list-style: none;
-        }
-
-        .sidebar nav li {
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar nav a {
-            color: var(--sidebar-text);
-            text-decoration: none;
-            display: block;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-
-        .sidebar nav a:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar nav a.active {
-            background: var(--primary-color);
-        }
-
-        .sidebar .cta-box {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        .sidebar .cta-box h3 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            color: white;
-        }
-
-        .sidebar .cta-box .cta-button-small {
-            display: block;
-            background: white;
-            color: var(--primary-color);
-            padding: 0.8rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        /* メインコンテンツ */
-        .main-content {
-            flex: 1;
-            padding: 3rem;
-            max-width: 900px;
-        }
-
-        section {
-            margin-bottom: 4rem;
-            scroll-margin-top: 2rem;
-        }
-
-        section h2 {
-            font-size: 2.2rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary-color);
-            border-bottom: 4px solid var(--primary-color);
-            padding-bottom: 0.5rem;
-            font-weight: 900;
-        }
-
-        section h3 {
-            font-size: 1.6rem;
-            margin: 2rem 0 1rem;
-            color: var(--text-color);
-            font-weight: 700;
-        }
-
-        section p {
-            margin-bottom: 1rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-        }
-
-        /* 問題カード */
-        .problem-card {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            color: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 16px rgba(220, 38, 38, 0.3);
-        }
-
-        .problem-card h3 {
-            color: white;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .problem-card ul {
-            list-style: none;
-            margin: 1rem 0;
-        }
-
-        .problem-card ul li {
-            padding: 0.8rem 0;
-            padding-left: 2rem;
-            position: relative;
-            font-size: 1.1rem;
-        }
-
-        .problem-card ul li:before {
-            content: "⚠️";
-            position: absolute;
-            left: 0;
-        }
-
-        /* 煽りカード */
-        .agitation-card {
-            background: #fff7ed;
-            border-left: 6px solid #f59e0b;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border-radius: 8px;
-        }
-
-        .agitation-card h4 {
-            color: #f59e0b;
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-
-        .agitation-card .stat {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--danger-color);
-            margin: 1rem 0;
-        }
-
-        /* ソリューションカード */
-        .solution-card {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
-        }
-
-        .solution-card h3 {
-            color: white;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .solution-card ul {
-            list-style: none;
-            margin: 1rem 0;
-        }
-
-        .solution-card ul li {
-            padding: 0.8rem 0;
-            padding-left: 2rem;
-            position: relative;
-            font-size: 1.1rem;
-        }
-
-        .solution-card ul li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            font-weight: bold;
-            font-size: 1.3rem;
-        }
-
-        /* 比較テーブル */
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .comparison-table th {
-            background: var(--primary-color);
-            color: white;
-            padding: 1.2rem;
-            font-weight: 700;
-        }
-
-        .comparison-table td {
-            padding: 1.2rem;
-            border-bottom: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .comparison-table tr:nth-child(even) {
-            background: var(--bg-secondary);
-        }
-
-        .comparison-table .before {
-            color: var(--danger-color);
-            font-weight: 600;
-        }
-
-        .comparison-table .after {
-            color: var(--success-color);
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        /* 限定オファー */
-        .limited-offer {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            padding: 3rem;
-            border-radius: 16px;
-            margin: 3rem 0;
-            text-align: center;
-            box-shadow: 0 12px 24px rgba(245, 158, 11, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .limited-offer:before {
-            content: "🎁";
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            font-size: 8rem;
-            opacity: 0.2;
-        }
-
-        .limited-offer h3 {
-            color: white;
-            font-size: 2.2rem;
-            margin-bottom: 1rem;
-            font-weight: 900;
-        }
-
-        .limited-offer .offer-badge {
-            display: inline-block;
-            background: white;
-            color: #f59e0b;
-            padding: 0.5rem 1.5rem;
-            border-radius: 30px;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
-        }
-
-        .limited-offer ul {
-            list-style: none;
-            margin: 2rem 0;
-            text-align: left;
-            display: inline-block;
-        }
-
-        .limited-offer ul li {
-            padding: 0.8rem 0;
-            padding-left: 2rem;
-            position: relative;
-            font-size: 1.15rem;
-        }
-
-        .limited-offer ul li:before {
-            content: "🎯";
-            position: absolute;
-            left: 0;
-        }
-
-        /* CTA大 */
-        .cta-section {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            color: white;
-            padding: 4rem 3rem;
-            border-radius: 16px;
-            text-align: center;
-            margin: 4rem 0;
-            box-shadow: 0 12px 24px rgba(220, 38, 38, 0.4);
-        }
-
-        .cta-section h3 {
-            color: white;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-weight: 900;
-        }
-
-        .cta-section p {
-            color: white;
-            opacity: 0.95;
-            margin-bottom: 2.5rem;
-            font-size: 1.2rem;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: white;
-            color: var(--primary-color);
-            padding: 1.5rem 3.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 900;
-            font-size: 1.3rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .cta-secondary {
-            display: inline-block;
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin: 0 0.5rem;
-            transition: all 0.2s;
-        }
-
-        .cta-secondary:hover {
-            background: white;
-            color: var(--primary-color);
-        }
-
-        /* 統計グリッド */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-item {
-            background: white;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-item .number {
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-item .label {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        /* タイムライン */
-        .timeline {
-            position: relative;
-            padding-left: 3rem;
-            margin: 2rem 0;
-        }
-
-        .timeline:before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--primary-color);
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-        }
-
-        .timeline-item:before {
-            content: "";
-            position: absolute;
-            left: -3.5rem;
-            top: 0;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: white;
-            border: 4px solid var(--primary-color);
-        }
-
-        .timeline-item h4 {
-            font-size: 1.3rem;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-
-        /* モバイルメニュー */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* レスポンシブ */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                position: fixed;
-                left: -280px;
-                top: 0;
-                height: 100vh;
-                z-index: 999;
-                transition: left 0.3s;
-            }
-
-            .sidebar.open {
-                left: 0;
-            }
-
-            .main-content {
-                padding: 1.5rem;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .header .subtitle {
-                font-size: 1.2rem;
-            }
-
-            section h2 {
-                font-size: 1.7rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .comparison-table {
-                font-size: 0.9rem;
-            }
-
-            .comparison-table th, .comparison-table td {
-                padding: 0.8rem 0.5rem;
-            }
-
-            .cta-button {
-                font-size: 1.1rem;
-                padding: 1.2rem 2.5rem;
-            }
-        }
-
-        /* スムーズスクロール */
         html {
             scroll-behavior: smooth;
         }
 
-        /* オーバーレイ */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 998;
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .overlay.active {
-            display: block;
-        }
-
-        /* カード */
-        .card {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .card h4 {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-
-        /* リスト */
-        .feature-list {
-            list-style: none;
-            margin: 1.5rem 0;
-        }
-
-        .feature-list li {
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-            background: var(--bg-secondary);
-            border-left: 4px solid var(--success-color);
-            border-radius: 4px;
-        }
-
-        .feature-list li strong {
-            color: var(--success-color);
-        }
-
-        /* チェックマーク */
-        .checkmark {
-            color: var(--success-color);
-            font-weight: bold;
-            margin-right: 0.5rem;
-        }
-
-        /* バッジ */
-        .badge {
-            display: inline-block;
-            background: var(--primary-color);
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-left: 0.5rem;
-        }
-
-        .badge.limited {
-            background: #f59e0b;
-            animation: pulse 2s infinite;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body>
-    <!-- 緊急CTA -->
-    <div class="urgent-cta">
-        ⚡ 先着10社限定！初期費用50%OFFキャンペーン実施中 - 2025年12月末まで ⚡
-    </div>
 
-    <!-- モバイルメニューボタン -->
-    <button class="mobile-menu-btn" onclick="toggleMenu()">☰ メニュー</button>
+<body class="bg-white text-text-main font-sans antialiased selection:bg-primary selection:text-white">
 
-    <!-- オーバーレイ -->
-    <div class="overlay" onclick="toggleMenu()"></div>
+    <!-- 緊急CTA バナー -->
+    <!-- <div class="bg-gradient-to-r from-red-600 to-red-700 text-white py-3 text-center font-bold text-sm md:text-base pulse-urgent sticky top-0 z-50 shadow-lg">
+        <i class="fas fa-bolt mr-2"></i>先着10社限定！初期費用50%OFFキャンペーン実施中 - 2025年12月末まで<i class="fas fa-bolt ml-2"></i>
+    </div> -->
 
-    <!-- ヘッダー -->
-    <div class="header">
-        <div class="subtitle">プロジェクト失敗の連鎖を断ち切る</div>
-        <h1>ツタAI</h1>
-        <p>AI駆動型プロジェクト管理で、成功率85%向上・コスト60%削減を実現</p>
-    </div>
+    <!-- ナビゲーション -->
+    <nav class="glass-nav sticky top-[0px] w-full z-40 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+                    <img src="image/TsutaAI_G_Trans.png" alt="TsutaAI Icon" class="h-8 w-auto">
+                    <span class="text-xl font-bold tracking-tight">ツタAI</span>
+                </div>
 
-    <!-- コンテナ -->
-    <div class="container">
-        <!-- サイドバー -->
-        <aside class="sidebar" id="sidebar">
-            <h2>目次</h2>
-            <nav>
-                <ul>
-                    <li><a href="#problem" onclick="scrollToSection('problem')">P: あなたの抱える問題</a></li>
-                    <li><a href="#agitation" onclick="scrollToSection('agitation')">A: このまま放置すると...</a></li>
-                    <li><a href="#solution" onclick="scrollToSection('solution')">SO: ツタAIによる解決</a></li>
-                    <li><a href="#evidence" onclick="scrollToSection('evidence')">実績・効果</a></li>
-                    <li><a href="#narrow" onclick="scrollToSection('narrow')">N: 限定オファー</a></li>
-                    <li><a href="#action" onclick="scrollToSection('action')">A: 今すぐ行動</a></li>
-                </ul>
-            </nav>
+                <div class="hidden md:flex space-x-6 items-center text-sm">
+                    <a href="#problem" class="font-medium text-text-sub hover:text-primary transition-colors">P: 問題</a>
+                    <a href="#agitation" class="font-medium text-text-sub hover:text-primary transition-colors">A: 放置すると...</a>
+                    <a href="#solution" class="font-medium text-text-sub hover:text-primary transition-colors">SO: 解決策</a>
+                    <a href="#evidence" class="font-medium text-text-sub hover:text-primary transition-colors">実績</a>
+                    <a href="#narrow" class="font-medium text-text-sub hover:text-primary transition-colors">N: 限定</a>
+                    <a href="#action" class="font-medium text-text-sub hover:text-primary transition-colors">A: 行動</a>
+                    <a href="index.html" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-bold rounded-full hover:bg-gray-200 transition-all">
+                        <i class="fas fa-home mr-1"></i>トップへ戻る
+                    </a>
+                </div>
 
-            <div class="cta-box">
-                <h3>お問い合わせ受付中</h3>
-                <a href="#contact-form" class="cta-button-small" onclick="scrollToSection('action')">今すぐ相談</a>
+                <div class="md:hidden flex items-center">
+                    <button id="hamburger" class="text-text-main focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
             </div>
-        </aside>
+        </div>
 
-        <!-- メインコンテンツ -->
-        <main class="main-content">
-            <!-- P: Problem（問題提起） -->
-            <section id="problem">
-                <h2>P: あなたの会社、こんな問題を抱えていませんか？</h2>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="#problem" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">P: 問題</a>
+                <a href="#agitation" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">A: 放置すると...</a>
+                <a href="#solution" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">SO: 解決策</a>
+                <a href="#evidence" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">実績</a>
+                <a href="#narrow" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">N: 限定</a>
+                <a href="#action" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">A: 行動</a>
+                <a href="index.html" class="mobile-link block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">トップへ戻る</a>
+            </div>
+        </div>
+    </nav>
 
-                <div class="problem-card">
-                    <h3>プロジェクト管理の5大問題</h3>
-                    <ul>
-                        <li><strong>納期遅延が常態化</strong> - 70%のプロジェクトが予定より2週間以上遅延</li>
-                        <li><strong>コスト超過</strong> - 予算の130%を消費、利益率が圧迫される</li>
-                        <li><strong>進捗が見えない</strong> - 報告が曖昧で、実態が把握できない</li>
-                        <li><strong>メンバーが疲弊</strong> - 長時間労働、離職率の上昇</li>
-                        <li><strong>属人化の罠</strong> - キーパーソンが休むとプロジェクトが停止</li>
-                    </ul>
-                </div>
+    <!-- ヒーローセクション -->
+    <section class="relative pt-20 pb-16 lg:pt-32 lg:pb-24 overflow-hidden bg-gradient-to-br from-red-600 to-red-700">
+        <div class="absolute inset-0 bg-gradient-to-br from-red-600/90 to-red-700/90"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center text-white">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-semibold mb-6 fade-in-up" style="animation-delay: 0.1s;">
+                <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                営業・導入担当者向け
+            </div>
 
-                <div class="card">
-                    <h4>よくある現場の声</h4>
-                    <p style="font-style: italic; color: var(--text-color);">
-                        「タスクの進捗確認だけで週に5時間も使っている...」<br>
-                        「誰が何をやっているのか分からず、常に不安」<br>
-                        「Excel管理が限界。更新が追いつかない」<br>
-                        「優秀なエンジニアが『管理が辛い』と退職してしまった」<br>
-                        「リスクに気づいた時には手遅れだった」
-                    </p>
-                </div>
+            <p class="text-xl md:text-2xl font-semibold mb-4 fade-in-up" style="animation-delay: 0.2s;">プロジェクト失敗の連鎖を断ち切る</p>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1] fade-in-up" style="animation-delay: 0.3s;">
+                ツタAI
+            </h1>
+            <p class="mt-4 max-w-3xl mx-auto text-lg md:text-xl opacity-95 fade-in-up" style="animation-delay: 0.4s;">
+                AI駆動型プロジェクト管理で、成功率85%向上・コスト60%削減を実現
+            </p>
 
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="number">68%</div>
-                        <div class="label">プロジェクト失敗率</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number">2週間</div>
-                        <div class="label">平均納期遅延</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number">30%</div>
-                        <div class="label">予算超過率</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number">45%</div>
-                        <div class="label">メンバー疲弊度</div>
-                    </div>
-                </div>
+            <div class="mt-10 flex justify-center gap-4 fade-in-up" style="animation-delay: 0.5s;">
+                <a href="#action" class="px-8 py-4 bg-white text-red-600 text-lg font-bold rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    今すぐお問い合わせ
+                </a>
+            </div>
+        </div>
+    </section>
 
-                <p style="font-size: 1.2rem; font-weight: 600; color: var(--primary-color); margin-top: 2rem;">
-                    これらの問題、<strong>すべてプロジェクト管理の欠陥が原因</strong>です。
+    <!-- メインコンテンツ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <!-- P: Problem（問題提起） -->
+        <section id="problem" class="mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4 tracking-tight">P: あなたの会社、こんな問題を抱えていませんか？</h2>
+            </div>
+
+            <div class="bg-gradient-to-br from-red-600 to-red-700 text-white p-8 md:p-12 rounded-3xl shadow-hover mb-8">
+                <h3 class="text-2xl md:text-3xl font-bold mb-6">プロジェクト管理の5大問題</h3>
+                <ul class="space-y-4 text-lg">
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-2xl mt-1"></i>
+                        <span><strong>納期遅延が常態化</strong> - 70%のプロジェクトが予定より2週間以上遅延</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-2xl mt-1"></i>
+                        <span><strong>コスト超過</strong> - 予算の130%を消費、利益率が圧迫される</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-2xl mt-1"></i>
+                        <span><strong>進捗が見えない</strong> - 報告が曖昧で、実態が把握できない</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-2xl mt-1"></i>
+                        <span><strong>メンバーが疲弊</strong> - 長時間労働、離職率の上昇</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-2xl mt-1"></i>
+                        <span><strong>属人化の罠</strong> - キーパーソンが休むとプロジェクトが停止</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft mb-8">
+                <h4 class="text-xl font-bold text-gray-900 mb-4">よくある現場の声</h4>
+                <p class="italic text-gray-600 leading-relaxed">
+                    「タスクの進捗確認だけで週に5時間も使っている...」<br>
+                    「誰が何をやっているのか分からず、常に不安」<br>
+                    「Excel管理が限界。更新が追いつかない」<br>
+                    「優秀なエンジニアが『管理が辛い』と退職してしまった」<br>
+                    「リスクに気づいた時には手遅れだった」
                 </p>
-            </section>
+            </div>
 
-            <!-- A: Agitation（煽り・共感） -->
-            <section id="agitation">
-                <h2>A: このまま放置すると、どうなるか...</h2>
-
-                <div class="agitation-card">
-                    <h4>🔥 1年後のあなたの会社</h4>
-                    <p>プロジェクト失敗が続き、顧客の信頼を失う。</p>
-                    <div class="stat">年間損失: 3,000万円</div>
-                    <p>納期遅延のペナルティ、追加工数、機会損失の合計。</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-red-600 mb-2">68%</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">プロジェクト<br>失敗率</div>
                 </div>
-
-                <div class="agitation-card">
-                    <h4>⚠️ 優秀な人材が次々と離職</h4>
-                    <p>
-                        非効率な管理体制に疲弊したエンジニアが退職。
-                        採用・教育コストで年間<strong>500万円/人</strong>の損失。
-                    </p>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-red-600 mb-2">2週間</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">平均納期<br>遅延</div>
                 </div>
-
-                <div class="agitation-card">
-                    <h4>📉 競合に遅れを取る</h4>
-                    <p>
-                        競合他社はすでにAI・DX化を進め、圧倒的なスピードでプロジェクトを成功させている。
-                        気づいた時には手遅れ。市場シェアを奪われる。
-                    </p>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-red-600 mb-2">30%</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">予算<br>超過率</div>
                 </div>
-
-                <div class="agitation-card">
-                    <h4>💔 経営リスクの増大</h4>
-                    <p>
-                        ・顧客からの信頼失墜<br>
-                        ・社員のモチベーション低下<br>
-                        ・経営判断のための正確なデータが取れない<br>
-                        ・銀行融資の審査にも悪影響<br>
-                    </p>
-                    <div class="stat">最悪のケース: 倒産</div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-red-600 mb-2">45%</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">メンバー<br>疲弊度</div>
                 </div>
+            </div>
 
-                <p style="font-size: 1.3rem; font-weight: 700; color: var(--danger-color); text-align: center; margin: 3rem 0;">
-                    <strong>手遅れになる前に、今すぐ行動が必要です。</strong>
+            <p class="text-xl md:text-2xl font-bold text-red-600 text-center mt-12">
+                これらの問題、<strong>すべてプロジェクト管理の欠陥が原因</strong>です。
+            </p>
+        </section>
+
+        <!-- A: Agitation（煽り・共感） -->
+        <section id="agitation" class="mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4 tracking-tight">A: このまま放置すると、どうなるか...</h2>
+            </div>
+
+            <div class="bg-orange-50 border-l-8 border-orange-500 p-8 rounded-xl mb-6">
+                <h4 class="text-xl font-bold text-orange-600 mb-3 flex items-center gap-2">
+                    <i class="fas fa-fire text-2xl"></i>1年後のあなたの会社
+                </h4>
+                <p class="text-gray-700 mb-4">プロジェクト失敗が続き、顧客の信頼を失う。</p>
+                <div class="text-4xl md:text-5xl font-black text-red-600 my-4">年間損失: 3,000万円</div>
+                <p class="text-gray-700">納期遅延のペナルティ、追加工数、機会損失の合計。</p>
+            </div>
+
+            <div class="bg-orange-50 border-l-8 border-orange-500 p-8 rounded-xl mb-6">
+                <h4 class="text-xl font-bold text-orange-600 mb-3 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>優秀な人材が次々と離職
+                </h4>
+                <p class="text-gray-700">
+                    非効率な管理体制に疲弊したエンジニアが退職。
+                    採用・教育コストで年間<strong>500万円/人</strong>の損失。
                 </p>
-            </section>
+            </div>
 
-            <!-- SO: Solution（解決策） -->
-            <section id="solution">
-                <h2>SO: ツタAIが、すべての問題を解決します</h2>
+            <div class="bg-orange-50 border-l-8 border-orange-500 p-8 rounded-xl mb-6">
+                <h4 class="text-xl font-bold text-orange-600 mb-3 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-2xl"></i>競合に遅れを取る
+                </h4>
+                <p class="text-gray-700">
+                    競合他社はすでにAI・DX化を進め、圧倒的なスピードでプロジェクトを成功させている。
+                    気づいた時には手遅れ。市場シェアを奪われる。
+                </p>
+            </div>
 
-                <div class="solution-card">
-                    <h3>✨ AIによる完全自動化</h3>
-                    <ul>
-                        <li><strong>WBS自動生成</strong> - 8時間 → 30分（95%削減）</li>
-                        <li><strong>進捗自動トラッキング</strong> - 手動入力不要</li>
-                        <li><strong>日報自動生成</strong> - 15分 → 3分（80%削減）</li>
-                        <li><strong>リスク自動検出</strong> - 問題が大きくなる前に警告</li>
+            <div class="bg-orange-50 border-l-8 border-orange-500 p-8 rounded-xl mb-6">
+                <h4 class="text-xl font-bold text-orange-600 mb-3 flex items-center gap-2">
+                    <i class="fas fa-heartbeat text-2xl"></i>経営リスクの増大
+                </h4>
+                <p class="text-gray-700 mb-4">
+                    ・顧客からの信頼失墜<br>
+                    ・社員のモチベーション低下<br>
+                    ・経営判断のための正確なデータが取れない<br>
+                    ・銀行融資の審査にも悪影響<br>
+                </p>
+                <div class="text-3xl md:text-4xl font-black text-red-600">最悪のケース: 倒産</div>
+            </div>
+
+            <p class="text-2xl md:text-3xl font-bold text-red-600 text-center mt-12">
+                <strong>手遅れになる前に、今すぐ行動が必要です。</strong>
+            </p>
+        </section>
+
+        <!-- SO: Solution（解決策） -->
+        <section id="solution" class="mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4 tracking-tight">SO: ツタAIが、すべての問題を解決します</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-3xl shadow-hover">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-robot text-3xl"></i>AIによる完全自動化
+                    </h3>
+                    <ul class="space-y-3 text-base">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>WBS自動生成</strong> - 8時間 → 30分（95%削減）</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>進捗自動トラッキング</strong> - 手動入力不要</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>日報自動生成</strong> - 15分 → 3分（80%削減）</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>リスク自動検出</strong> - 問題が大きくなる前に警告</span>
+                        </li>
                     </ul>
                 </div>
 
-                <div class="solution-card">
-                    <h3>📊 データ駆動型経営の実現</h3>
-                    <ul>
-                        <li><strong>リアルタイム可視化</strong> - プロジェクト健全性を0-100で評価</li>
-                        <li><strong>予測分析</strong> - AIが納期・コストを予測</li>
-                        <li><strong>154種類のデータ</strong> - あらゆる角度から分析可能</li>
-                        <li><strong>レポート自動生成</strong> - CSV/Markdown/JSON/HTML出力</li>
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-3xl shadow-hover">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-chart-bar text-3xl"></i>データ駆動型経営の実現
+                    </h3>
+                    <ul class="space-y-3 text-base">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>リアルタイム可視化</strong> - プロジェクト健全性を0-100で評価</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>予測分析</strong> - AIが納期・コストを予測</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>154種類のデータ</strong> - あらゆる角度から分析可能</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>レポート自動生成</strong> - CSV/Markdown/JSON/HTML出力</span>
+                        </li>
                     </ul>
                 </div>
 
-                <div class="solution-card">
-                    <h3>🤝 チームパフォーマンス最大化</h3>
-                    <ul>
-                        <li><strong>スマート自動割り当て</strong> - スキルマッチングで生産性20%向上</li>
-                        <li><strong>ヘルプリクエスト機能</strong> - ブロッカーを迅速解消</li>
-                        <li><strong>メンタルヘルス分析</strong> - 離職リスクを早期発見</li>
-                        <li><strong>作業負荷の均等化</strong> - 残業時間30%削減</li>
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-3xl shadow-hover">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-users text-3xl"></i>チームパフォーマンス最大化
+                    </h3>
+                    <ul class="space-y-3 text-base">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>スマート自動割り当て</strong> - スキルマッチングで生産性20%向上</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>ヘルプリクエスト機能</strong> - ブロッカーを迅速解消</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>メンタルヘルス分析</strong> - 離職リスクを早期発見</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-check mt-1"></i>
+                            <span><strong>作業負荷の均等化</strong> - 残業時間30%削減</span>
+                        </li>
                     </ul>
                 </div>
+            </div>
 
-                <h3 style="margin-top: 3rem;">導入前 vs 導入後</h3>
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>指標</th>
-                            <th>導入前</th>
-                            <th>導入後</th>
-                            <th>改善率</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>プロジェクト成功率</strong></td>
-                            <td class="before">32%</td>
-                            <td class="after">85%</td>
-                            <td class="after">+165%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>納期遵守率</strong></td>
-                            <td class="before">45%</td>
-                            <td class="after">92%</td>
-                            <td class="after">+104%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>管理工数</strong></td>
-                            <td class="before">週20時間</td>
-                            <td class="after">週8時間</td>
-                            <td class="after">-60%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>コスト超過</strong></td>
-                            <td class="before">+30%</td>
-                            <td class="after">+5%</td>
-                            <td class="after">-83%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>メンバー満足度</strong></td>
-                            <td class="before">52点</td>
-                            <td class="after">87点</td>
-                            <td class="after">+67%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>離職率</strong></td>
-                            <td class="before">25%</td>
-                            <td class="after">8%</td>
-                            <td class="after">-68%</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">導入前 vs 導入後</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-red-600 text-white">
+                                <th class="p-4 text-left font-bold">指標</th>
+                                <th class="p-4 text-center font-bold">導入前</th>
+                                <th class="p-4 text-center font-bold">導入後</th>
+                                <th class="p-4 text-center font-bold">改善率</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700">
+                            <tr class="border-b border-gray-200">
+                                <td class="p-4 font-semibold">プロジェクト成功率</td>
+                                <td class="p-4 text-center text-red-600 font-semibold">32%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">85%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">+165%</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 bg-gray-50">
+                                <td class="p-4 font-semibold">納期遵守率</td>
+                                <td class="p-4 text-center text-red-600 font-semibold">45%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">92%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">+104%</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-4 font-semibold">管理工数</td>
+                                <td class="p-4 text-center text-red-600 font-semibold">週20時間</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">週8時間</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">-60%</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 bg-gray-50">
+                                <td class="p-4 font-semibold">コスト超過</td>
+                                <td class="p-4 text-center text-red-600 font-semibold">+30%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">+5%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">-83%</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-4 font-semibold">メンバー満足度</td>
+                                <td class="p-4 text-center text-red-600 font-semibold">52点</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">87点</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">+67%</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold">離職率</td>
+                                <td class="p-4 text-center text-red-600 font-semibold">25%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">8%</td>
+                                <td class="p-4 text-center text-green-600 font-bold text-lg">-68%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
-            <!-- 実績・効果 -->
-            <section id="evidence">
-                <h2>導入実績・効果</h2>
+        <!-- 実績・効果 -->
+        <section id="evidence" class="mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4 tracking-tight">導入実績・効果</h2>
+            </div>
 
-                <div class="card">
-                    <h4>A社（製造業・従業員120名）の事例</h4>
-                    <p><strong>課題:</strong> 納期遅延が常態化し、顧客からクレームが続出</p>
-                    <p><strong>導入後の効果:</strong></p>
-                    <ul class="feature-list">
-                        <li><strong>納期遵守率</strong> 40% → 95%（+137%）</li>
-                        <li><strong>クレーム数</strong> 月15件 → 月2件（-87%）</li>
-                        <li><strong>年間コスト削減</strong> 4,200万円</li>
-                        <li><strong>ROI</strong> 初年度で420%</li>
+            <div class="space-y-8 mb-12">
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft">
+                    <h4 class="text-xl font-bold text-red-600 mb-4">A社（製造業・従業員120名）の事例</h4>
+                    <p class="text-gray-700 mb-2"><strong>課題:</strong> 納期遅延が常態化し、顧客からクレームが続出</p>
+                    <p class="text-gray-700 mb-4"><strong>導入後の効果:</strong></p>
+                    <ul class="space-y-2 mb-4">
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">納期遵守率</strong> 40% → 95%（+137%）
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">クレーム数</strong> 月15件 → 月2件（-87%）
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">年間コスト削減</strong> 4,200万円
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">ROI</strong> 初年度で420%
+                        </li>
                     </ul>
-                    <p style="font-style: italic; margin-top: 1rem;">
+                    <p class="italic text-gray-600 border-l-4 border-gray-300 pl-4">
                         「AIによるリスク早期検出で、問題が大きくなる前に対処できるようになりました。
                         プロジェクトマネージャーの負担も大幅に軽減され、本来の戦略業務に集中できています。」
-                        <br>- A社 開発部長
+                        <br><span class="font-semibold">- A社 開発部長</span>
                     </p>
                 </div>
 
-                <div class="card">
-                    <h4>B社（IT企業・従業員80名）の事例</h4>
-                    <p><strong>課題:</strong> 優秀なエンジニアの離職が続き、プロジェクトが停滞</p>
-                    <p><strong>導入後の効果:</strong></p>
-                    <ul class="feature-list">
-                        <li><strong>離職率</strong> 28% → 7%（-75%）</li>
-                        <li><strong>残業時間</strong> 月平均45時間 → 月平均28時間（-38%）</li>
-                        <li><strong>メンバー満足度</strong> 48点 → 89点（+85%）</li>
-                        <li><strong>生産性</strong> +32%向上</li>
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft">
+                    <h4 class="text-xl font-bold text-red-600 mb-4">B社（IT企業・従業員80名）の事例</h4>
+                    <p class="text-gray-700 mb-2"><strong>課題:</strong> 優秀なエンジニアの離職が続き、プロジェクトが停滞</p>
+                    <p class="text-gray-700 mb-4"><strong>導入後の効果:</strong></p>
+                    <ul class="space-y-2 mb-4">
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">離職率</strong> 28% → 7%（-75%）
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">残業時間</strong> 月平均45時間 → 月平均28時間（-38%）
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">メンバー満足度</strong> 48点 → 89点（+85%）
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">生産性</strong> +32%向上
+                        </li>
                     </ul>
-                    <p style="font-style: italic; margin-top: 1rem;">
+                    <p class="italic text-gray-600 border-l-4 border-gray-300 pl-4">
                         「ヘルプリクエスト機能で、困った時にすぐ助けを呼べるようになり、
                         メンバーのストレスが激減しました。自動トラッキングで手動入力の負担もなくなり、
                         働きやすい環境になったと好評です。」
-                        <br>- B社 CTO
+                        <br><span class="font-semibold">- B社 CTO</span>
                     </p>
                 </div>
 
-                <div class="card">
-                    <h4>C社（サービス業・従業員50名）の事例</h4>
-                    <p><strong>課題:</strong> Excelでの管理が限界、進捗が全く見えない</p>
-                    <p><strong>導入後の効果:</strong></p>
-                    <ul class="feature-list">
-                        <li><strong>進捗可視化</strong> リアルタイムでダッシュボード表示</li>
-                        <li><strong>管理工数</strong> 週25時間 → 週7時間（-72%）</li>
-                        <li><strong>意思決定スピード</strong> 3倍に向上</li>
-                        <li><strong>プロジェクト完了率</strong> 55% → 91%（+65%）</li>
+                <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft">
+                    <h4 class="text-xl font-bold text-red-600 mb-4">C社（サービス業・従業員50名）の事例</h4>
+                    <p class="text-gray-700 mb-2"><strong>課題:</strong> Excelでの管理が限界、進捗が全く見えない</p>
+                    <p class="text-gray-700 mb-4"><strong>導入後の効果:</strong></p>
+                    <ul class="space-y-2 mb-4">
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">進捗可視化</strong> リアルタイムでダッシュボード表示
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">管理工数</strong> 週25時間 → 週7時間（-72%）
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">意思決定スピード</strong> 3倍に向上
+                        </li>
+                        <li class="bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <strong class="text-green-600">プロジェクト完了率</strong> 55% → 91%（+65%）
+                        </li>
                     </ul>
-                    <p style="font-style: italic; margin-top: 1rem;">
+                    <p class="italic text-gray-600 border-l-4 border-gray-300 pl-4">
                         「もうExcel地獄に戻れません。全体が一目で分かり、経営判断が劇的に速くなりました。
                         投資額の5倍以上のリターンを実感しています。」
-                        <br>- C社 代表取締役
+                        <br><span class="font-semibold">- C社 代表取締役</span>
                     </p>
                 </div>
+            </div>
 
-                <div class="stats-grid" style="margin-top: 3rem;">
-                    <div class="stat-item">
-                        <div class="number">97%</div>
-                        <div class="label">顧客満足度</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number">85%</div>
-                        <div class="label">成功率向上</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number">60%</div>
-                        <div class="label">コスト削減</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number">420%</div>
-                        <div class="label">平均ROI</div>
-                    </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-gray-900 mb-2">97%</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">顧客<br>満足度</div>
                 </div>
-            </section>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-gray-900 mb-2">85%</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">成功率<br>向上</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-gray-900 mb-2">60%</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">コスト<br>削減</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center hover:shadow-hover transition-all">
+                    <div class="text-4xl md:text-5xl font-black text-gray-900 mb-2">420%</div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase">平均<br>ROI</div>
+                </div>
+            </div>
+        </section>
 
-            <!-- N: Narrow Down（限定性・緊急性） -->
-            <section id="narrow">
-                <h2>N: 今だけの限定オファー <span class="badge limited">残り7社</span></h2>
+        <!-- N: Narrow Down（限定性・緊急性） -->
+        <section id="narrow" class="mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4 tracking-tight">
+                    N: 今だけの限定オファー
+                    <span class="inline-block px-4 py-1 bg-red-600 text-white text-base rounded-full ml-2 animate-pulse">残り7社</span>
+                </h2>
+            </div>
 
-                <div class="limited-offer">
-                    <div class="offer-badge">🎁 先着10社限定キャンペーン</div>
-                    <h3>2025年12月末まで</h3>
-                    <ul>
-                        <li><strong>初期費用50%OFF</strong> - 100万円 → 50万円（50万円お得！）</li>
-                        <li><strong>30日間無料トライアル</strong> - 全機能使い放題</li>
-                        <li><strong>専任コンサルタント配置</strong> - 導入から運用まで徹底サポート</li>
-                        <li><strong>カスタマイズ無料</strong> - 業務フローに合わせた調整（通常50万円）</li>
-                        <li><strong>トレーニング無料</strong> - 管理者・メンバー向け研修（通常30万円）</li>
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-8 md:p-12 rounded-3xl shadow-hover relative overflow-hidden mb-8">
+                <div class="absolute top-0 right-0 text-9xl opacity-20">🎁</div>
+                <div class="relative z-10">
+                    <div class="inline-block bg-white text-orange-600 px-6 py-2 rounded-full font-bold text-lg mb-6">
+                        🎁 先着10社限定キャンペーン
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-black mb-6">2025年12月末まで</h3>
+                    <ul class="space-y-4 text-lg mb-8">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-gift text-2xl mt-1"></i>
+                            <span><strong>初期費用50%OFF</strong> - 100万円 → 50万円（50万円お得！）</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-gift text-2xl mt-1"></i>
+                            <span><strong>30日間無料トライアル</strong> - 全機能使い放題</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-gift text-2xl mt-1"></i>
+                            <span><strong>専任コンサルタント配置</strong> - 導入から運用まで徹底サポート</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-gift text-2xl mt-1"></i>
+                            <span><strong>カスタマイズ無料</strong> - 業務フローに合わせた調整（通常50万円）</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-gift text-2xl mt-1"></i>
+                            <span><strong>トレーニング無料</strong> - 管理者・メンバー向け研修（通常30万円）</span>
+                        </li>
                     </ul>
-                    <p style="margin-top: 2rem; font-size: 1.3rem; font-weight: bold;">
-                        合計<span style="font-size: 2rem; color: #fff;">130万円相当</span>がすべて無料！
+                    <p class="text-2xl md:text-3xl font-bold">
+                        合計<span class="text-4xl md:text-5xl font-black ml-2">130万円相当</span>がすべて無料！
                     </p>
                 </div>
+            </div>
 
-                <div class="card">
-                    <h4>⏰ なぜ今すぐ導入すべきなのか？</h4>
-                    <ul class="feature-list">
-                        <li><strong>1日遅れるごとに、損失が増える</strong> - 平均1プロジェクトあたり10万円/週の機会損失</li>
-                        <li><strong>年末までに導入で、来期から効果を実感</strong> - 年度始めからフル活用できる</li>
-                        <li><strong>限定枠はすでに3社が申し込み済み</strong> - 残り7社のみ</li>
-                        <li><strong>競合が導入する前に差をつける</strong> - 先行者利益を獲得</li>
-                    </ul>
-                </div>
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft mb-8">
+                <h4 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-clock text-red-600 text-2xl"></i>
+                    なぜ今すぐ導入すべきなのか？
+                </h4>
+                <ul class="space-y-3">
+                    <li class="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <strong class="text-green-600">1日遅れるごとに、損失が増える</strong> - 平均1プロジェクトあたり10万円/週の機会損失
+                    </li>
+                    <li class="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <strong class="text-green-600">年末までに導入で、来期から効果を実感</strong> - 年度始めからフル活用できる
+                    </li>
+                    <li class="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <strong class="text-green-600">限定枠はすでに3社が申し込み済み</strong> - 残り7社のみ
+                    </li>
+                    <li class="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <strong class="text-green-600">競合が導入する前に差をつける</strong> - 先行者利益を獲得
+                    </li>
+                </ul>
+            </div>
 
-                <div class="agitation-card">
-                    <h4>⚠️ この機会を逃すと...</h4>
-                    <p>
-                        ・初期費用50万円が通常価格に戻る<br>
-                        ・カスタマイズ費用50万円が別途必要<br>
-                        ・トレーニング費用30万円が別途必要<br>
-                        ・専任コンサルタントが付かない（共有サポートのみ）<br>
-                    </p>
-                    <div class="stat" style="font-size: 2rem;">合計130万円の損失</div>
-                </div>
-
-                <p style="font-size: 1.4rem; font-weight: 700; color: var(--primary-color); text-align: center; margin: 3rem 0;">
-                    <strong>迷っている時間はありません。今すぐ行動してください。</strong>
+            <div class="bg-orange-50 border-l-8 border-orange-500 p-8 rounded-xl">
+                <h4 class="text-xl font-bold text-orange-600 mb-4 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                    この機会を逃すと...
+                </h4>
+                <p class="text-gray-700 mb-4">
+                    ・初期費用50万円が通常価格に戻る<br>
+                    ・カスタマイズ費用50万円が別途必要<br>
+                    ・トレーニング費用30万円が別途必要<br>
+                    ・専任コンサルタントが付かない（共有サポートのみ）<br>
                 </p>
-            </section>
+                <div class="text-4xl md:text-5xl font-black text-red-600">合計130万円の損失</div>
+            </div>
 
-            <!-- A: Action（行動喚起） -->
-            <section id="action">
-                <h2>A: 今すぐお問い合わせください</h2>
+            <p class="text-2xl md:text-3xl font-bold text-red-600 text-center mt-12">
+                <strong>迷っている時間はありません。今すぐ行動してください。</strong>
+            </p>
+        </section>
 
-                <div class="cta-section">
-                    <h3>プロジェクト失敗の連鎖を<br>今すぐ断ち切る</h3>
-                    <p>
-                        ツタAIの圧倒的な効果について詳しくお知りになりたい方は、<br>
-                        お気軽にお問い合わせください。
-                    </p>
-                    <div>
-                        <a href="mailto:2025gw04@gmail.com?subject=お問い合わせ" class="cta-button">
-                            今すぐお問い合わせ
-                        </a>
+        <!-- A: Action（行動喚起） -->
+        <section id="action" class="mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-text-main mb-4 tracking-tight">A: 今すぐお問い合わせください</h2>
+            </div>
+
+            <div class="bg-gradient-to-br from-red-600 to-red-700 text-white p-8 md:p-12 rounded-3xl shadow-hover text-center mb-8">
+                <h3 class="text-3xl md:text-4xl font-black mb-4">プロジェクト失敗の連鎖を<br>今すぐ断ち切る</h3>
+                <p class="text-lg md:text-xl mb-8 opacity-95">
+                    ツタAIの圧倒的な効果について詳しくお知りになりたい方は、<br class="hidden md:block">
+                    お気軽にお問い合わせください。
+                </p>
+                <a href="mailto:2025gw04@gmail.com?subject=お問い合わせ" class="inline-block px-10 py-5 bg-white text-red-600 text-xl font-black rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    今すぐお問い合わせ
+                </a>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft mb-8">
+                <h4 class="text-xl font-bold text-gray-900 mb-6">お問い合わせから導入までの流れ</h4>
+                <div class="space-y-6 relative pl-8 border-l-4 border-red-600">
+                    <div class="relative">
+                        <div class="absolute -left-11 top-0 w-6 h-6 rounded-full bg-white border-4 border-red-600"></div>
+                        <h5 class="text-lg font-bold text-red-600 mb-2">STEP 1: お問い合わせ</h5>
+                        <p class="text-gray-600">メールにて御社の課題やご要望をお聞かせください。</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-11 top-0 w-6 h-6 rounded-full bg-white border-4 border-red-600"></div>
+                        <h5 class="text-lg font-bold text-red-600 mb-2">STEP 2: ヒアリング・提案</h5>
+                        <p class="text-gray-600">御社の課題に合わせて、最適なソリューションをご提案いたします。</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-11 top-0 w-6 h-6 rounded-full bg-white border-4 border-red-600"></div>
+                        <h5 class="text-lg font-bold text-red-600 mb-2">STEP 3: 導入決定・契約</h5>
+                        <p class="text-gray-600">導入内容にご納得いただいた上で正式契約。安心してご導入いただけます。</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-11 top-0 w-6 h-6 rounded-full bg-white border-4 border-red-600"></div>
+                        <h5 class="text-lg font-bold text-red-600 mb-2">STEP 4: 本格展開（2週間）</h5>
+                        <p class="text-gray-600">全プロジェクト・全メンバーへ展開。専任コンサルタントが徹底サポート。</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-11 top-0 w-6 h-6 rounded-full bg-white border-4 border-red-600"></div>
+                        <h5 class="text-lg font-bold text-red-600 mb-2">STEP 5: 運用開始・効果測定</h5>
+                        <p class="text-gray-600">月次レビューで効果を可視化。継続的な改善提案。</p>
                     </div>
                 </div>
+            </div>
 
-                <div class="card">
-                    <h4>お問い合わせから導入までの流れ</h4>
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <h4>STEP 1: お問い合わせ</h4>
-                            <p>メールにて御社の課題やご要望をお聞かせください。</p>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>STEP 2: ヒアリング・提案</h4>
-                            <p>御社の課題に合わせて、最適なソリューションをご提案いたします。</p>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>STEP 3: 導入決定・契約</h4>
-                            <p>導入内容にご納得いただいた上で正式契約。安心してご導入いただけます。</p>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>STEP 4: 本格展開（2週間）</h4>
-                            <p>全プロジェクト・全メンバーへ展開。専任コンサルタントが徹底サポート。</p>
-                        </div>
-                        <div class="timeline-item">
-                            <h4>STEP 5: 運用開始・効果測定</h4>
-                            <p>月次レビューで効果を可視化。継続的な改善提案。</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card" id="contact-form">
-                    <h4>お問い合わせ・資料請求</h4>
-                    <p><strong>メール:</strong> <a href="mailto:2025gw04@gmail.com">2025gw04@gmail.com</a></p>
-                    <p style="margin-top: 2rem;">
-                        <strong>お問い合わせ時に以下をお伝えください:</strong><br>
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft mb-8" id="contact-form">
+                <h4 class="text-xl font-bold text-gray-900 mb-4">お問い合わせ・資料請求</h4>
+                <p class="text-gray-700 mb-2"><strong>メール:</strong> <a href="mailto:2025gw04@gmail.com" class="text-red-600 hover:text-red-700 underline">2025gw04@gmail.com</a></p>
+                <div class="mt-6 p-6 bg-gray-50 rounded-xl">
+                    <p class="font-bold text-gray-900 mb-3">お問い合わせ時に以下をお伝えください:</p>
+                    <p class="text-gray-700">
                         ・会社名・従業員数<br>
                         ・現在抱えているプロジェクト管理の課題<br>
                         ・ご希望のサービス内容
                     </p>
                 </div>
+            </div>
 
-                <div class="card">
-                    <h4>よくあるご質問</h4>
-                    <p><strong>Q: 小規模な会社でも導入できますか？</strong></p>
-                    <p>A: はい、10名から1000名まで、あらゆる規模に対応しています。</p>
-
-                    <p style="margin-top: 1rem;"><strong>Q: 既存システムとの連携は？</strong></p>
-                    <p>A: Jira、Redmine、Slackなど主要ツールと連携可能です。カスタマイズもご相談ください。</p>
-
-                    <p style="margin-top: 1rem;"><strong>Q: セキュリティは大丈夫？</strong></p>
-                    <p>A: ISO27001準拠、データ暗号化、定期的な脆弱性診断を実施。安心してご利用いただけます。</p>
-                </div>
-
-                <div class="cta-section">
-                    <h3>迷っている時間が、最大の損失です</h3>
-                    <p>
-                        競合はすでに動き出しています。<br>
-                        1日でも早く導入し、プロジェクト成功への道を歩み始めてください。
-                    </p>
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-soft mb-8">
+                <h4 class="text-xl font-bold text-gray-900 mb-6">よくあるご質問</h4>
+                <div class="space-y-6">
                     <div>
-                        <a href="mailto:2025gw04@gmail.com?subject=お問い合わせ" class="cta-button">
-                            今すぐお問い合わせ
-                        </a>
+                        <p class="font-bold text-gray-900 mb-2">Q: 小規模な会社でも導入できますか？</p>
+                        <p class="text-gray-600">A: はい、10名から1000名まで、あらゆる規模に対応しています。</p>
                     </div>
-                    <p style="margin-top: 1.5rem; font-size: 1rem;">
-                        ※ 先着10社限定・残り7社のみ ※
-                    </p>
+                    <div>
+                        <p class="font-bold text-gray-900 mb-2">Q: 既存システムとの連携は？</p>
+                        <p class="text-gray-600">A: Jira、Redmine、Slackなど主要ツールと連携可能です。カスタマイズもご相談ください。</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900 mb-2">Q: セキュリティは大丈夫？</p>
+                        <p class="text-gray-600">A: ISO27001準拠、データ暗号化、定期的な脆弱性診断を実施。安心してご利用いただけます。</p>
+                    </div>
                 </div>
-            </section>
-        </main>
+            </div>
+
+            <div class="bg-gradient-to-br from-red-600 to-red-700 text-white p-8 md:p-12 rounded-3xl shadow-hover text-center">
+                <h3 class="text-3xl md:text-4xl font-black mb-4">迷っている時間が、最大の損失です</h3>
+                <p class="text-lg md:text-xl mb-8 opacity-95">
+                    競合はすでに動き出しています。<br>
+                    1日でも早く導入し、プロジェクト成功への道を歩み始めてください。
+                </p>
+                <a href="mailto:2025gw04@gmail.com?subject=お問い合わせ" class="inline-block px-10 py-5 bg-white text-red-600 text-xl font-black rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    今すぐお問い合わせ
+                </a>
+                <p class="mt-6 text-sm font-semibold">※ 先着10社限定・残り7社のみ ※</p>
+            </div>
+        </section>
+
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="image/TsutaAI_G_Trans.png" alt="TsutaAI" class="h-8 w-auto">
+                        <span class="text-xl font-bold">ツタAI</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">AI駆動型プロジェクト管理システム<br>プロジェクトの成功を、AIと共に。</p>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4 text-white">製品</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="index.html#features" class="text-gray-400 hover:text-primary transition-colors">主要機能</a></li>
+                        <li><a href="index.html#demo" class="text-gray-400 hover:text-primary transition-colors">デモ</a></li>
+                        <li><a href="index.html#tech" class="text-gray-400 hover:text-primary transition-colors">技術スタック</a></li>
+                        <li><a href="index.html#howto" class="text-gray-400 hover:text-primary transition-colors">使い方</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4 text-white">リソース</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="PR-EXECUTIVE.html" class="text-gray-400 hover:text-primary transition-colors">経営者向け</a></li>
+                        <li><a href="PR-SALES.html" class="text-gray-400 hover:text-primary transition-colors">営業向け</a></li>
+                        <li><a href="PR-USER.html" class="text-gray-400 hover:text-primary transition-colors">ユーザー向け</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4 text-white">会社</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="index.html#about-name" class="text-gray-400 hover:text-primary transition-colors">名前の由来</a></li>
+                        <li><a href="mailto:2025gw04@gmail.com" class="text-gray-400 hover:text-primary transition-colors">お問い合わせ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center">
+                <p class="text-gray-500 text-sm">&copy; 2025 ツタAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script>
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
+        // モバイルメニュー
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
 
-        function scrollToSection(id) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-                // モバイルメニューを閉じる
-                if (window.innerWidth <= 768) {
-                    toggleMenu();
-                }
-            }
-        }
-
-        // アクティブリンクのハイライト
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('section');
-            const navLinks = document.querySelectorAll('.sidebar nav a');
-
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= sectionTop - 60) {
-                    current = section.getAttribute('id');
-                }
+        // モバイルメニューのリンククリック時にメニューを閉じる
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
             });
+        });
 
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === '#' + current) {
-                    link.classList.add('active');
+        // スムーズスクロール
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
         });
