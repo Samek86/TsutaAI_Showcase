@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ツタAI - AI駆動型プロジェクト管理システム</title>
+    <title>TsutaAI - AI駆動型プロジェクト管理システム</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
             box-sizing: border-box;
         }
 
-        /* :root {
+        :root {
             --primary-color: #4F46E5;
             --primary-dark: #4338CA;
             --secondary-color: #F59E0B;
@@ -23,25 +23,6 @@
             --text-gray: #6B7280;
             --border-color: #E5E7EB;
             --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        } */
-
-        :root {
-            --primary-color: #75EA66 ;
-            --primary-dark: #4BA262;
-            --secondary-color: #F59E0B;
-            --accent-color: #10B981;
-            --bg-light: #F9FAFB;
-            --bg-white: #FFFFFF;
-            --text-dark: #1F2937;
-            --text-gray: #6B7280;
-            --border-color: #E5E7EB;
-            --gradient-1: linear-gradient(135deg, #75EA66 0%, #4BA262 100%);
             --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -142,8 +123,8 @@
         /* ヒーローセクション */
         .hero {
             margin-top: 70px;
-            padding: 100px 2rem 80px 2rem;
-            background: linear-gradient(135deg, #75EA66  0%, #4BA262 100%);
+            padding: 100px 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-align: center;
             position: relative;
@@ -407,7 +388,7 @@
         .feature-image {
             width: 100%;
             height: 250px;
-            background: linear-gradient(135deg, #75EA66  0%, #4BA262 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -505,7 +486,7 @@
         .video-placeholder {
             width: 100%;
             aspect-ratio: 16/9;
-            background: linear-gradient(135deg, #75EA66  0%, #4BA262 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -602,7 +583,7 @@
         /* 技術スタックセクション */
         .tech-stack {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
         }
 
@@ -705,7 +686,7 @@
         }
 
         .cta-content {
-            max-width: 730px;
+            max-width: 700px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
@@ -847,22 +828,6 @@
             .cta-content p {
                 font-size: 1rem;
             }
-
-            .video-placeholder {
-                font-size: 1rem;
-            }
-
-            .video-placeholder-text {
-                padding: 1rem;
-            }
-
-            .video-placeholder-text strong {
-                font-size: 1rem;
-            }
-
-            .video-placeholder-text small {
-                font-size: 0.75rem;
-            }
         }
 
         @media (max-width: 480px) {
@@ -871,7 +836,7 @@
             }
 
             .hero {
-                padding: 60px 1rem 30px 1rem;
+                padding: 60px 1rem;
             }
 
             .section {
@@ -921,294 +886,6 @@
             color: var(--text-gray);
             font-size: 1rem;
         }
-
-        /* 名前の由来セクション */
-        .name-origin-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .origin-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .origin-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .origin-icon {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            display: block;
-        }
-
-        .origin-card h3 {
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-            font-weight: 700;
-        }
-
-        .origin-card p {
-            color: var(--text-gray);
-            line-height: 1.8;
-            text-align: left;
-        }
-
-        .name-philosophy {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow-md);
-            border-left: 6px solid var(--primary-color);
-        }
-
-        .name-philosophy h3 {
-            font-size: 1.75rem;
-            margin-bottom: 1.5rem;
-            color: var(--text-dark);
-            font-weight: 700;
-        }
-
-        .name-philosophy p {
-            color: var(--text-gray);
-            line-height: 2;
-            font-size: 1.1rem;
-        }
-
-        /* リソースリンクセクション */
-        .resource-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-
-        .resource-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: block;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .resource-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient-1);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
-        }
-
-        .resource-card:nth-child(2)::before {
-            background: var(--gradient-2);
-        }
-
-        .resource-card:nth-child(3)::before {
-            background: var(--gradient-3);
-        }
-
-        .resource-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .resource-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .resource-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1.5rem;
-            display: block;
-        }
-
-        .resource-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-            font-weight: 700;
-        }
-
-        .resource-card p {
-            color: var(--text-gray);
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            min-height: 3.6rem;
-        }
-
-        .resource-arrow {
-            color: var(--primary-color);
-            font-weight: 600;
-            font-size: 1rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: gap 0.3s ease;
-        }
-
-        .resource-card:hover .resource-arrow {
-            gap: 1rem;
-        }
-
-        /* 画像カルーセル */
-        .feature-image-content {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .carousel-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .carousel-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        .carousel-image.active {
-            opacity: 1;
-        }
-
-        /* ポップアップギャラリー */
-        .gallery-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .gallery-modal.active {
-            display: flex;
-        }
-
-        .gallery-content {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
-
-        .gallery-image {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            display: block;
-        }
-
-        .gallery-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 40px;
-            color: white;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 10px;
-            line-height: 1;
-            transition: transform 0.2s ease;
-            z-index: 10001;
-        }
-
-        .gallery-close:hover {
-            transform: scale(1.2);
-        }
-
-        .gallery-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.4);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            font-size: 30px;
-            padding: 20px 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
-            z-index: 10002;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .gallery-nav:hover {
-            background: rgba(255, 255, 255, 0.5);
-            border-color: rgba(255, 255, 255, 0.8);
-        }
-
-        .gallery-nav.prev {
-            left: 20px;
-        }
-
-        .gallery-nav.next {
-            right: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .gallery-content {
-                padding: 20px;
-            }
-
-            .gallery-close {
-                top: 10px;
-                right: 10px;
-                font-size: 30px;
-            }
-
-            .gallery-nav {
-                font-size: 28px;
-                padding: 18px 12px;
-                background: rgba(255, 255, 255, 0.5);
-                border: 2px solid rgba(255, 255, 255, 0.7);
-            }
-
-            .gallery-nav.prev {
-                left: 5px;
-            }
-
-            .gallery-nav.next {
-                right: 5px;
-            }
-        }
     </style>
 </head>
 
@@ -1216,8 +893,7 @@
     <!-- ナビゲーション -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <div class="logo">
-                <img src="image/TsutaAI_G_Trans.png" alt="TsutaAI Icon" style="height: 2rem; vertical-align: text-bottom; margin-right: 0.3rem;">ツタAI</div>
+            <div class="logo">🌱 TsutaAI</div>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#hero">ホーム</a></li>
                 <li><a href="#problem">課題</a></li>
@@ -1226,8 +902,6 @@
                 <li><a href="#demo">デモ</a></li>
                 <li><a href="#howto">使い方</a></li>
                 <li><a href="#tech">技術</a></li>
-                <li><a href="#about-name">名前の由来</a></li>
-                <li><a href="#resources">詳細資料</a></li>
             </ul>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -1286,7 +960,7 @@
 
     <!-- ソリューションセクション -->
     <section class="section bg-light" id="solution">
-        <h2 class="section-title">ツタAIが、すべて解決します</h2>
+        <h2 class="section-title">TsutaAIが、すべて解決します</h2>
         <p class="section-subtitle">AI駆動型プロジェクト管理で、QCDの劇的な改善を実現</p>
 
         <div class="solution-grid fade-in">
@@ -1329,19 +1003,19 @@
     <!-- 主要機能セクション -->
     <section class="section" id="features">
         <h2 class="section-title">圧倒的な機能で、プロジェクトを成功に導く</h2>
-        <p class="section-subtitle">競合にはない、ツタAIだけの革新的な機能</p>
+        <p class="section-subtitle">競合にはない、TsutaAIだけの革新的な機能</p>
 
         <div class="features-grid fade-in">
             <!-- 機能1: AI自動WBS生成 -->
             <div class="feature-item">
                 <div class="feature-image">
-                    <div class="feature-image-content" data-carousel="carousel-1">
-                        <div class="carousel-container">
-                            <img src="image/1_1.png" alt="プロンプト情報のAI自動生成" class="carousel-image active">
-                            <img src="image/1_2.png" alt="新規プロジェクト作成" class="carousel-image">
-                            <img src="image/1_3.png" alt="AIでWBS自動生成" class="carousel-image">
-                            <img src="image/1_4.png" alt="WBS管理画面" class="carousel-image">
-                        </div>
+                    <div class="feature-image-content">
+                        <strong>📸 スクリーンショットをここに配置</strong><br>
+                        <small>WBS自動生成画面のキャプチャ<br>
+                            - プロジェクト概要入力フォーム<br>
+                            - 「AI生成」ボタンクリック<br>
+                            - 生成されたWBSツリー表示<br>
+                            - タスクの階層構造が見える画面</small>
                     </div>
                 </div>
                 <div class="feature-content">
@@ -1357,13 +1031,13 @@
             <!-- 機能2: スキルベース自動割り当て -->
             <div class="feature-item">
                 <div class="feature-image gradient-2">
-                    <div class="feature-image-content" data-carousel="carousel-2">
-                        <div class="carousel-container">
-                            <img src="image/2_1.png" alt="タスク自動割り当て画面" class="carousel-image active">
-                            <img src="image/2_2.png" alt="メンバー一覧とスキル表示" class="carousel-image">
-                            <img src="image/2_3.png" alt="各メンバーの負荷状況" class="carousel-image">
-                            <img src="image/2_4.png" alt="最適化スコア表示" class="carousel-image">
-                        </div>
+                    <div class="feature-image-content">
+                        <strong>📸 スクリーンショットをここに配置</strong><br>
+                        <small>タスク自動割り当て画面のキャプチャ<br>
+                            - メンバー一覧とスキル表示<br>
+                            - タスクとメンバーのマッチング結果<br>
+                            - 各メンバーの負荷状況グラフ<br>
+                            - 最適化スコア表示</small>
                     </div>
                 </div>
                 <div class="feature-content">
@@ -1379,21 +1053,21 @@
             <!-- 機能3: デスクトップ監視 & AI活動分析 -->
             <div class="feature-item">
                 <div class="feature-image gradient-3">
-                    <div class="feature-image-content" data-carousel="carousel-3">
-                        <div class="carousel-container">
-                            <img src="image/3_1.png" alt="デスクトップアプリ" class="carousel-image active">
-                            <img src="image/3_2.png" alt="作業ウィジェット表示" class="carousel-image">
-                            <img src="image/3_3.png" alt="進捗度" class="carousel-image">
-                        </div>
+                    <div class="feature-image-content">
+                        <strong>📸 スクリーンショットをここに配置</strong><br>
+                        <small>デスクトップアプリとAI分析画面<br>
+                            - 作業ウィジェット表示<br>
+                            - 1時間ごとのAI分析結果<br>
+                            - 集中度・進捗度・効率性グラフ<br>
+                            - AIからの改善提案表示</small>
                     </div>
                 </div>
                 <div class="feature-content">
                     <span class="feature-badge">完全実装</span>
                     <h3>デスクトップ監視 & AI活動分析</h3>
-                    <p>作業中のマウス、キーボード、アクティブウィンドウを自動トラッキング。さらに、指定フォルダ内のファイル修正やGit/SVNへのプッシュも自動感知。1時間ごとにAIが集中度・進捗度・効率性を分析し、改善提案を提供します。
-                    </p>
+                    <p>作業中のマウス、キーボード、アクティブウィンドウ、ファイル変更を自動トラッキング。1時間ごとにAIが集中度・進捗度・効率性を分析し、改善提案を提供します。</p>
                     <div class="feature-note">
-                        <strong>💡 効果:</strong> 作業の可視化により生産性20%向上。問題の早期発見で手戻りを削減。Git/SVN連携で開発履歴も自動記録。
+                        <strong>💡 効果:</strong> 作業の可視化により生産性20%向上。問題の早期発見で手戻りを削減。
                     </div>
                 </div>
             </div>
@@ -1401,12 +1075,13 @@
             <!-- 機能4: 自動日報生成 -->
             <div class="feature-item">
                 <div class="feature-image gradient-4">
-                    <div class="feature-image-content" data-carousel="carousel-4">
-                        <div class="carousel-container">
-                            <img src="image/4_1.png" alt="自動日報生成画面" class="carousel-image active">
-                            <img src="image/4_2.png" alt="自己評価" class="carousel-image">
-                            <img src="image/4_3.png" alt="AIからのフィードバック" class="carousel-image">
-                        </div>
+                    <div class="feature-image-content">
+                        <strong>📸 スクリーンショットをここに配置</strong><br>
+                        <small>自動日報生成画面のキャプチャ<br>
+                            - 作業終了ボタンクリック後の画面<br>
+                            - AIが生成した日報内容<br>
+                            - ファイル変更点の自動検出<br>
+                            - 自己評価入力フォーム</small>
                     </div>
                 </div>
                 <div class="feature-content">
@@ -1422,13 +1097,13 @@
             <!-- 機能5: リアルタイムガントチャート -->
             <div class="feature-item">
                 <div class="feature-image">
-                    <div class="feature-image-content" data-carousel="carousel-5">
-                        <div class="carousel-container">
-                            <img src="image/5_1.png" alt="ガントチャート" class="carousel-image active">
-                            <img src="image/5_2.png" alt="タスク一覧" class="carousel-image">
-                            <img src="image/5_3.png" alt="看板ボード" class="carousel-image">
-                            <img src="image/5_4.png" alt="カレンダー" class="carousel-image">
-                        </div>
+                    <div class="feature-image-content">
+                        <strong>📸 スクリーンショットをここに配置</strong><br>
+                        <small>ガントチャート画面のキャプチャ<br>
+                            - タスクバーのドラッグ&ドロップ<br>
+                            - 依存関係の線表示<br>
+                            - クリティカルパスのハイライト<br>
+                            - 進捗状況の色分け表示</small>
                     </div>
                 </div>
                 <div class="feature-content">
@@ -1444,15 +1119,13 @@
             <!-- 機能6: メンタルヘルスケア -->
             <div class="feature-item">
                 <div class="feature-image gradient-2">
-                    <div class="feature-image-content" data-carousel="carousel-6">
-                        <div class="carousel-container">
-                            <img src="image/6_1.png" alt="メンタルヘルスケア" class="carousel-image active">
-                            <img src="image/6_2.png" alt="メンタルヘルスケア" class="carousel-image">
-                            <img src="image/6_3.png" alt="メンタルヘルスケア" class="carousel-image">
-                            <img src="image/6_4.png" alt="メンタルヘルスケア" class="carousel-image">
-                            <img src="image/6_5.png" alt="メンタルヘルスケア" class="carousel-image">
-                            <img src="image/6_6.png" alt="メンタルヘルスケア" class="carousel-image">
-                        </div>
+                    <div class="feature-image-content">
+                        <strong>📸 スクリーンショットをここに配置</strong><br>
+                        <small>メンタルヘルス管理画面のキャプチャ<br>
+                            - 気分トラッキンググラフ<br>
+                            - ストレスレベル推移<br>
+                            - AIからのアドバイス表示<br>
+                            - ヘルプリクエストボタン</small>
                     </div>
                 </div>
                 <div class="feature-content">
@@ -1526,14 +1199,14 @@
 
     <!-- デモ動画セクション -->
     <section class="section" id="demo">
-        <h2 class="section-title">ツタAIの実力を見る</h2>
+        <h2 class="section-title">TsutaAIの実力を見る</h2>
         <p class="section-subtitle">実際の動作をデモ動画でご確認ください</p>
 
         <div class="demo-video-container fade-in">
             <div class="video-placeholder">
                 <div class="video-placeholder-text">
-                    <strong>🎬 デモ動画（作成予定）</strong><br>
-                    <small style="margin-top: 1rem; display: block;">
+                    <strong>🎬 デモ動画をここに配置</strong><br>
+                    <small style="margin-top: 1rem; display: block;">推奨内容:<br>
                         ① プロジェクト作成 → AI WBS生成の流れ（30秒）<br>
                         ② ガントチャートでのスケジュール調整（20秒）<br>
                         ③ デスクトップアプリでの作業開始 → AI分析（30秒）<br>
@@ -1542,8 +1215,8 @@
                 </div>
             </div>
             <div class="video-info">
-                <h3>ツタAI 製品デモ（1分40秒）</h3>
-                <p>プロジェクト作成からタスク完了まで、ツタAIの主要機能をわかりやすく紹介します。</p>
+                <h3>TsutaAI 製品デモ（1分40秒）</h3>
+                <p>プロジェクト作成からタスク完了まで、TsutaAIの主要機能をわかりやすく紹介します。</p>
             </div>
         </div>
     </section>
@@ -1605,7 +1278,7 @@
                 <ul class="tech-list">
                     <li>Node.js 18+ - 高性能ランタイム</li>
                     <li>Express 5.1 - Webフレームワーク</li>
-                    <li>Oracle, SQLiteなどの様々なDB対応可能</li>
+                    <li>SQLite 3 - 軽量データベース</li>
                     <li>WebSocket - リアルタイム通信</li>
                 </ul>
             </div>
@@ -1621,8 +1294,8 @@
             <div class="tech-category">
                 <h3>🤖 AI連携</h3>
                 <ul class="tech-list">
-                    <li>外部LLMまたはローカルLLMも可能</li>
-                    <li>セキュリティ対策を施したAPIインターフェース</li>
+                    <li>Groq API - 高速LLM推論</li>
+                    <li>GPT-OSS-120B - 大規模言語モデル</li>
                     <li>29個のプロンプトテンプレート</li>
                     <li>JWT認証 & RBAC権限管理</li>
                 </ul>
@@ -1630,75 +1303,13 @@
         </div>
     </section>
 
-    <!-- ツタAIの名前の由来セクション -->
-    <section class="section bg-light" id="about-name">
-        <h2 class="section-title"><img src="image/TsutaAI_G_Trans.png" alt="TsutaAI Icon" style="height: 3rem; vertical-align: sub; margin-right: 0.5rem;">ツタAI - 名前に込めた想い</h2>
-        <p class="section-subtitle">伝え合い、支え合い、成長し合う - チームをつなぐ新しい形</p>
-
-        <div class="name-origin-container fade-in">
-            <div class="origin-card">
-                <div class="origin-icon">💬</div>
-                <h3>伝え合い</h3>
-                <p>日本語の「伝え合う」から。チームメンバー同士が情報を共有し、互いに理解し合うことの大切さを表現しています。AIが仲介役となり、スムーズなコミュニケーションを実現します。</p>
-            </div>
-
-            <div class="origin-card">
-                <div class="origin-icon"><img src="image/TsutaAI_G_Trans.png" alt="TsutaAI Icon" style="height: 6rem; vertical-align: middle;"></div>
-                <h3>ツタの特性</h3>
-                <p>植物の「ツタ」のように、プロジェクトメンバー全員をつなぎ、支え合う存在でありたい。ツタは壁を這い上がり、建物全体を覆うように成長します。同様に、ツタAIはチーム全体に広がり、組織を強くします。
-                </p>
-            </div>
-
-            <div class="origin-card">
-                <div class="origin-icon">🤖</div>
-                <h3>AI技術</h3>
-                <p>最先端のAI技術を活用し、人間の能力を拡張。単なる管理ツールではなく、チームの成長を促進するインテリジェントなパートナーとして機能します。</p>
-            </div>
-        </div>
-
-        <div class="name-philosophy fade-in">
-            <h3>私たちの哲学</h3>
-            <p>プロジェクトの成功は、技術だけでなく「人と人とのつながり」から生まれます。ツタAIは、チームメンバーが互いに支え合い、情報を伝え合い、共に成長できる環境を作ります。ツタが壁を這い上がるように、チーム全体が一体となって目標に向かって進んでいく。そんな未来を実現するためのツールです。
-            </p>
-        </div>
-    </section>
-
-    <!-- 詳細資料へのリンクセクション -->
-    <section class="section" id="resources">
-        <h2 class="section-title">もっと詳しく知る</h2>
-        <p class="section-subtitle">あなたの立場に合わせた詳細資料をご用意しています</p>
-
-        <div class="resource-links fade-in">
-            <a href="PR-EXECUTIVE.html" class="resource-card">
-                <div class="resource-icon">👔</div>
-                <h3>経営者の方へ</h3>
-                <p>投資対効果、ビジネスインパクト、導入メリットを詳しくご説明します</p>
-                <span class="resource-arrow">詳細を見る →</span>
-            </a>
-
-            <a href="PR-SALES.html" class="resource-card">
-                <div class="resource-icon">📊</div>
-                <h3>営業・導入担当者の方へ</h3>
-                <p>機能詳細、競合比較、導入プロセスなど、提案に必要な情報をまとめています</p>
-                <span class="resource-arrow">詳細を見る →</span>
-            </a>
-
-            <a href="PR-USER.html" class="resource-card">
-                <div class="resource-icon">👨‍💻</div>
-                <h3>実際に使うユーザーの方へ</h3>
-                <p>日々の業務がどう変わるか、使い方のコツ、メリットを分かりやすく解説します</p>
-                <span class="resource-arrow">詳細を見る →</span>
-            </a>
-        </div>
-    </section>
-
     <!-- CTAセクション -->
     <section class="cta-section">
         <div class="cta-content">
-            <h2>導入のご相談はこちらから</h2>
-            <p>貴社の課題や導入イメージをヒアリングし、最適な活用方法をご提案します。デモ環境のご用意はありませんので、まずはお気軽にお問い合わせください。</p>
+            <h2>今すぐTsutaAIを体験しよう</h2>
+            <p>プロジェクト管理の常識を変える、AI駆動型システムを今すぐお試しください。<br>まずはデモをご覧いただき、その威力を実感してください。</p>
             <div class="cta-buttons">
-                <a href="mailto:2025gw04@gmail.com" class="btn btn-secondary">お問い合わせ</a>
+                <a href="mailto:info@tsutaai.com" class="btn btn-secondary">お問い合わせ</a>
             </div>
         </div>
     </section>
@@ -1707,7 +1318,7 @@
     <footer>
         <div class="footer-content">
             <div class="footer-section">
-                <h3>ツタAI</h3>
+                <h3>TsutaAI</h3>
                 <p>AI駆動型プロジェクト管理システム<br>プロジェクトの成功を、AIと共に。</p>
             </div>
             <div class="footer-section">
@@ -1739,19 +1350,9 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 ツタAI. All rights reserved.</p>
+            <p>&copy; 2025 TsutaAI. All rights reserved.</p>
         </div>
     </footer>
-
-    <!-- ギャラリーモーダル -->
-    <div class="gallery-modal" id="galleryModal">
-        <button class="gallery-close" onclick="closeGallery()">&times;</button>
-        <button class="gallery-nav prev" onclick="navigateGallery(-1)">&#10094;</button>
-        <div class="gallery-content">
-            <img src="" alt="ギャラリー画像" class="gallery-image" id="galleryImage">
-        </div>
-        <button class="gallery-nav next" onclick="navigateGallery(1)">&#10095;</button>
-    </div>
 
     <script>
         // ハンバーガーメニュー
@@ -1811,154 +1412,6 @@
                 }
             });
         });
-
-        // 画像カルーセル機能
-        const carousels = {};
-        const CAROUSEL_INTERVAL = 3000; // 3秒間隔
-
-        // 各カルーセルを初期化
-        document.querySelectorAll('[data-carousel]').forEach(container => {
-            const carouselId = container.getAttribute('data-carousel');
-            const images = container.querySelectorAll('.carousel-image');
-
-            if (images.length > 0) {
-                carousels[carouselId] = {
-                    container: container,
-                    images: images,
-                    currentIndex: 0,
-                    interval: null
-                };
-
-                // 自動ローテーション開始
-                startCarousel(carouselId);
-
-                // クリックでギャラリーを開く
-                container.addEventListener('click', () => {
-                    openGallery(carouselId);
-                });
-            }
-        });
-
-        function startCarousel(carouselId) {
-            const carousel = carousels[carouselId];
-            if (!carousel) return;
-
-            // 既存のインターバルをクリア
-            if (carousel.interval) {
-                clearInterval(carousel.interval);
-            }
-
-            // 新しいインターバルを設定
-            carousel.interval = setInterval(() => {
-                nextImage(carouselId);
-            }, CAROUSEL_INTERVAL);
-        }
-
-        function nextImage(carouselId) {
-            const carousel = carousels[carouselId];
-            if (!carousel) return;
-
-            carousel.images[carousel.currentIndex].classList.remove('active');
-            carousel.currentIndex = (carousel.currentIndex + 1) % carousel.images.length;
-            carousel.images[carousel.currentIndex].classList.add('active');
-        }
-
-        // ギャラリーモーダル機能
-        let currentGallery = null;
-        let currentGalleryIndex = 0;
-
-        function openGallery(carouselId) {
-            const carousel = carousels[carouselId];
-            if (!carousel) return;
-
-            currentGallery = carousel;
-            currentGalleryIndex = carousel.currentIndex;
-
-            // カルーセルの自動ローテーションを停止
-            if (carousel.interval) {
-                clearInterval(carousel.interval);
-            }
-
-            // モーダルを表示
-            const modal = document.getElementById('galleryModal');
-            const galleryImage = document.getElementById('galleryImage');
-
-            galleryImage.src = carousel.images[currentGalleryIndex].src;
-            modal.classList.add('active');
-
-            // Escキーで閉じる
-            document.addEventListener('keydown', handleGalleryKeydown);
-        }
-
-        function closeGallery() {
-            const modal = document.getElementById('galleryModal');
-            modal.classList.remove('active');
-
-            // カルーセルの自動ローテーションを再開
-            if (currentGallery) {
-                const carouselId = currentGallery.container.getAttribute('data-carousel');
-                startCarousel(carouselId);
-            }
-
-            currentGallery = null;
-            document.removeEventListener('keydown', handleGalleryKeydown);
-        }
-
-        function navigateGallery(direction) {
-            if (!currentGallery) return;
-
-            const totalImages = currentGallery.images.length;
-            currentGalleryIndex = (currentGalleryIndex + direction + totalImages) % totalImages;
-
-            const galleryImage = document.getElementById('galleryImage');
-            galleryImage.src = currentGallery.images[currentGalleryIndex].src;
-        }
-
-        function handleGalleryKeydown(e) {
-            if (e.key === 'Escape') {
-                closeGallery();
-            } else if (e.key === 'ArrowLeft') {
-                navigateGallery(-1);
-            } else if (e.key === 'ArrowRight') {
-                navigateGallery(1);
-            }
-        }
-
-        // モーダルの背景クリックで閉じる
-        document.getElementById('galleryModal').addEventListener('click', (e) => {
-            if (e.target.id === 'galleryModal') {
-                closeGallery();
-            }
-        });
-
-        // タッチスワイプ機能
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const minSwipeDistance = 50; // 最小スワイプ距離（ピクセル）
-
-        const galleryModal = document.getElementById('galleryModal');
-
-        galleryModal.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        galleryModal.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-
-        function handleSwipe() {
-            const swipeDistance = touchEndX - touchStartX;
-
-            // 右にスワイプ（前の画像）
-            if (swipeDistance > minSwipeDistance) {
-                navigateGallery(-1);
-            }
-            // 左にスワイプ（次の画像）
-            else if (swipeDistance < -minSwipeDistance) {
-                navigateGallery(1);
-            }
-        }
     </script>
 </body>
 
